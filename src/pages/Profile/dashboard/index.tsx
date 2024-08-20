@@ -9,15 +9,16 @@ import {
   MDBTypography,
 } from "mdb-react-ui-kit";
 import { useOutletContext } from "react-router-dom";
-import { IContext, IPost } from "../../../helpers/types";
+import { IContext, IPost, IUser } from "../../../helpers/types";
 import { useEffect, useRef, useState } from "react";
-import { getAllPosts, handleUpload } from "../../../helpers/api";
+import { getAllPosts, getFollowings, handleUpload } from "../../../helpers/api";
 import { BASE, DEF } from "../../../helpers/default";
 import { Gallery } from "../../../components/Gallery";
 
 export function Profile() {
   const { account, setAccount } = useOutletContext<IContext>();
   const [posts, setPosts] = useState<IPost[]>([])
+  const [flwings, setFlwings] = useState<IUser[]>([])
   const photo = useRef<HTMLInputElement | null>(null);
   const choosePhoto = () => {
     const file = photo.current?.files?.[0];
@@ -34,8 +35,12 @@ export function Profile() {
     getAllPosts()
       .then((response) => {
         setPosts(response.payload as IPost[])
+        getFollowings()
+          .then(response => {
+            setFlwings(response.payload as IUser[])
+          })
       })
-  })
+  }, [])
 
 
 
@@ -88,7 +93,7 @@ export function Profile() {
                     </MDBCardText>
                   </div>
                   <div>
-                    <MDBCardText className="mb-1 h5">{account.following?.length}</MDBCardText>
+                    <MDBCardText className="mb-1 h5">{flwings.length}</MDBCardText>
                     <MDBCardText className="small text-muted mb-0">
                       Following
                     </MDBCardText>
